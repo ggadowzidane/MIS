@@ -1,0 +1,23 @@
+{
+  "name": "mis",
+  "version": "1.0.0",
+  "description": "mis project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ggadowzidane/MIS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ggadowzidane/MIS/issues"
+  },
+  "homepage": "https://github.com/ggadowzidane/MIS#readme",
+  "dependencies": {
+    "mongoose": "^4.11.7",
+    "mongoose-auto-increment": "^5.0.1"
+  }
+}
