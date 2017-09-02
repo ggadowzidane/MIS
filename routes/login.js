@@ -4,7 +4,7 @@ var Employee = mongoose.model('Employee');
 
 var router = express.Router();
 
-router.post("/mis/0.1/login" , function(req,res,next){
+router.post("/mis/1.0/login" , function(req,res,next){
   console.info("login id::"+req.body.loginId +"////password"+req.body.loginPassword);
   //if(req.Method=="POST"){ //login check
     Employee.findOne({

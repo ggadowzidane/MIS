@@ -4,7 +4,7 @@ var Employee = mongoose.model('Employee');
 //var Department = mongoose.model('Department');
 var router = express.Router();
 
-router.all("/mis/0.1/employees",function(req,res,next){
+router.all("/mis/1.0/employees",function(req,res,next){
 
   //Employee 전체 조회 router
   if(req.method =="GET"){
@@ -65,7 +65,7 @@ router.all("/mis/0.1/employees",function(req,res,next){
 });
 
 //비밀번호 초기화
-router.get("/mis/0.1/employees/:employeeId/pwdReset",function(req,res,next){
+router.get("/mis/1.0/employees/:employeeId/pwdReset",function(req,res,next){
   Employee.where({
     id:req.params.EmployeeId
   }).update({
@@ -79,7 +79,7 @@ router.get("/mis/0.1/employees/:employeeId/pwdReset",function(req,res,next){
 });
 
 //비밀번호 변경
-router.put("/mis/0.1/employees/:employeeId/pwdChange",function(req,res,next){
+router.put("/mis/1.0/employees/:employeeId/pwdChange",function(req,res,next){
   Employee.where({
     id:req.body.EmployeeId
   }).update({
@@ -92,7 +92,7 @@ router.put("/mis/0.1/employees/:employeeId/pwdChange",function(req,res,next){
   });
 });
 
-router.all("/mis/0.1/employees/:employeeId",function(req,res,next){
+router.all("/mis/1.0/employees/:employeeId",function(req,res,next){
   if(req.method =="GET"){ //사원정보조회
     Employee.findOne({
       id:req.params.employeeId
