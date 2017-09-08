@@ -156,14 +156,17 @@ router.delete("/mis/1.0/employees/:employeeId",function(req,res,next){
 });
 
 //메일 중복 확인
-router.get("/employees/emailCheck/:emailAddress",function(req,res,next){
+router.get("/mis/1.0/employees/emailCheck/:emailAddress",function(req,res,next){
   Employee.findOne({
     email:req.params.emailAddress
   }).exec(function(error,results){
     if(error){
       return next(error);
     }
-    res.json(results);
+    var checkYnVal = true;   //이메일 중복 체크 여부
+    if(results == null) {  checkYnVal = false;   }
+    //이메일 중복체크 하여 중복확인 결과 리턴
+    res.json({checkYn:checkYnVal});
   });
 });
 
