@@ -33,7 +33,8 @@ var EmployeeSchema = new Schema({
   },
   email:{
     type:String,
-    required:true
+    required:true,
+    unique:true
   },
   phone:{
     type:String,
@@ -83,7 +84,8 @@ var EmployeeSchema = new Schema({
   },
   id:{
     type:String,
-    required:true
+    required:true,
+    unique:true
   },
   password:{
     type:String,

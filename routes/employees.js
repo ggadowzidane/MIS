@@ -20,10 +20,10 @@ router.get("/mis/1.0/employees",function(req,res,next){
 
   if(employeeName==null){    }
   else {
-    array["employeeName"] = employeeName;
+    array["name"] = employeeName;
   }
 
-  Employee.find(array).sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
+  Employee.find(array).sort('id').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
     if(error){
       return next(error);
     }
@@ -38,7 +38,7 @@ router.post("/mis/1.0/employees",function(req,res,next){
                                   name : req.body.EmployeeName,
                                   birth : req.body.EmployeeBirth,
                                   position : req.body.EmployeePosition,
-                                  deparment : req.body.EmployeeDepartment,
+                                  department : req.body.EmployeeDepartment,
                                   join_yyyymm : new Date(),
                                   gender : req.body.EmployeeGender,
                                   email : req.body.EmployeeEmail,
@@ -119,6 +119,7 @@ router.get("/mis/1.0/employees/:employeeId",function(req,res,next){
 //사원 정보 수정
 router.put("/mis/1.0/employees/:employeeId",function(req,res,next){
 
+  /*
   const array = {};
   if(req.body.EmployeeType==3){ //일반 사원 화면의 수정일 경우
     array["phone"]      =req.body.EmployeePhone,
@@ -138,12 +139,39 @@ router.put("/mis/1.0/employees/:employeeId",function(req,res,next){
     array["salary"]     =req.body.EmployeeSalary,
     array["update_date"]=new Date()
   }
+  */
   //사원정보 수정 시 넘어오는 값을 EmployyId로 할 것 2017-08-30
+  /*
   Employee.update({id : req.body.EmployeeId}, array , function(error,raw){
     if (error) {
       next(error);
     }
     res.json(raw);
+  });
+  */
+  Employee.findOne({
+    id:req.params.employeeId
+  }).exec(function(error,searchEmployee){
+    searchEmployee.name = req.body.EmployeeName || searchEmployee.name;
+    searchEmployee.gender = req.body.EmployeeGender || searchEmployee.gender;
+    searchEmployee.birth = req.body.EmployeeBirth || searchEmployee.birth;
+    searchEmployee.phone = req.body.EmployeePhone || searchEmployee.phone;
+    searchEmployee.email = req.body.EmployeeEmail || searchEmployee.email;
+    searchEmployee.department = req.body.EmployeeDepartment || searchEmployee.department;
+    searchEmployee.position = req.body.EmployeePosition || searchEmployee.position;
+    searchEmployee.address = req.body.EmployeeAddress || searchEmployee.address;
+    searchEmployee.zipcode = req.body.EmployeeZipcode || searchEmployee.zipcode;
+    searchEmployee.salary = req.body.EmployeeSalary || searchEmployee.salary;
+
+    searchEmployee.save(function(error,employee){
+      if(error){
+        return next(error);
+      }
+      var updateYnVal = true;   //이메일 중복 체크 여부
+      if(employee == null) {  updateYnVal = false;   }
+      //회원정보수정 성공여부 리턴
+      res.json({updateYn:updateYnVal});
+    });
   });
 });
 
