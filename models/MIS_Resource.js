@@ -10,7 +10,7 @@ var ResourceSchema = new Schema({
     type:String,
     required:true
   },
-  employee_code:{
+  employee_id:{
     type:Schema.Types.ObjectId,
     ref:'Employee'
   },

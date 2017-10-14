@@ -24,15 +24,7 @@ var VacationSchema = new Schema({
     type:String,
     required:true
   },
-  employee_phone1:{
-    type:Number,
-    required:true
-  },
-  employee_phone2:{
-    type:Number,
-    required:true
-  },
-  employee_phone3:{
+  employee_phone:{
     type:Number,
     required:true
   },

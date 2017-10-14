@@ -20,7 +20,7 @@ router.get("/mis/1.0/employees",function(req,res,next){
 
   if(employeeName==null){    }
   else {
-    array["name"] = employeeName;
+    employeearray["name"] = employeeName;
   }
 
   Employee.find(array).sort('id').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){

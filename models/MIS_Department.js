@@ -10,6 +10,10 @@ var DepartmentSchema = new Schema({
     type:String,
     required:true
   },
+  representation:{
+    type:String,
+    requried:true
+  }
   description:{
     type:String
   },

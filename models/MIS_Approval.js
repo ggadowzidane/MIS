@@ -60,6 +60,13 @@ var ApprovalSchema = new Schema({
   hold_date:{
     type:Date,
     default:new Date()
+  },
+  approval_date{
+    type:Date,
+    deafult:new Date('YYYY-MM-DD');
+  },
+  approval_data{
+    type:[String] //결재 데이터 문자열 배열로 가지고 있을
   }
 });
 
