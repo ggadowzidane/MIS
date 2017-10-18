@@ -14,34 +14,22 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
   var approvalState = req.query.approvalState;
 
   //이것도 페이징 처리 하는것인지 확인하여 queryString restfulAPI에도 추가하는지 확인
-  //그리고 결재 시작일자와 결재 끝나는 일자에 대해서 그기간에 딱 맞는 결재만 출력 하는지
-  //아니면 겹치는 조건이 어떻게 되는지 확인하기
 
-  //결재상태 코드값 정의하기 Ex) 1이면 결재상신 , 2이면 결재완료 등등
-
-  if(approvalState==1){ //결재승인 이전은 결재테이블에서 조회
-    Approval.find({
-      request_date:{"$gte":approvalStartDate, "$lt":approvalEndDate},
-      request_employee_code:employeeId,
-      state:approvalState
-    }).exec(function(req,res,next){
-      if(error){
-        return next(error);
-      }
-      res.json(results);
-    });
-  } else{  // 결재승인 이후는 휴가테이블에서 조회
-    Vacation.find({
-      //일단 소스는 휴가요청날짜로 처리 (추후 변경예정)
-      request_date:{"$gte":approvalStartDate, "$lt":approvalEndDate},
-      employee_code:employeeId
-    }).exec(function(req,res,next){
-      if(error){
-        return next(error);
-      }
-      res.json(results);
-    });
-  }
+  //휴가결재 목록 조회 시 결재요청직원 아이디 or 결재참조직원아이디 or 결재승인직원아이디 인 목록을 다 가져와야 한다.
+  //approvalState : 전체보기(0),기안(1),승인(2),반려(3)
+  //휴가결재 목록조회에서는 결재에 대한 정보만 나타낸다. (TABLE : APPROVAL)
+  //완료된 휴가 리스트들은 휴가 목록조회에서 보여준다. (TABLE : VACATION)
+  Approval.find({
+    //or 조건 추가예정 line18
+    request_date:{"$gte":approvalStartDate, "$lt":approvalEndDate},
+    request_employee_code:employeeId,
+    state:approvalState
+  }).exec(function(req,res,next){
+    if(error){
+      return next(error);
+    }
+    res.json(results);
+  });
 });
 
 //휴가결재 상세조회
@@ -75,27 +63,27 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
     type:req.body.ApprovalType,
     state:"1",
     request_employee_code:req.body.ApprovalRequestEmployeeCode,
-    request_date:new Date('YYYY-MM-DD');
+    request_date:new Date();
     reference_employee_code:req.body.ApprovalReferenceEmployeeCode,
     approval_employee_code:req.body.ApprovalEmployeeCode,
     request_description:req.body.ApprovalRequestDescription,
     approval_date:req.body.ApprovalDate,
-    insert_date:new Date('YYYY-MM-DD'),
+    insert_date:new Date(),
     //나중에 휴가에 들어갈 데이터들을 문자열 변수로 지정
     approval_datas:[
-                    newCode,  // 코드
-                    req.body.ApprovalType,  //타입
+                    newCode,  // 코드 (결재코드랑 휴가코드는 달라야한다. 휴가코드는 사원의 휴가코드가 unique 해야할듯 수정필요)
+                    req.body.ApprovalVacationType,  //타입
                     req.body.ApprovalStartDate, //시작기간
                     req.body.ApprovalEndDate, //끝기간
                     req.body.ApprovalRequestDescription,
                     req.body.ApprovalEmployeePhone,
-                    new Date('YYYY-MM-DD'), //request_Date
+                    new Date(), //request_Date
                     'Y', //approval_yn
                     req.body.ApprovalEmployeeCode, //employee_code
-                    new Date('YYYY-MM-DD'), // approval_date
+                    new Date(), // approval_date
                     '', //return_description
-                    new Date('YYYY-MM-DD'), //insert_date
-                    new Date('YYYY-MM-DD') // update_date 수정할때 데이터 수정
+                    new Date(), //insert_date
+                    new Date() // update_date 수정할때 데이터 수정
                   ]
   });
 
@@ -113,3 +101,5 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
       })
   });
 });
+
+//수정항목 : 휴가 시작 , 휴가 종료 , 연락처 , 참조자 목록 , 휴가 사유 , 승인자 목록

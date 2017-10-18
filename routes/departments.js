@@ -13,11 +13,13 @@ router.get('/mis/1.0/departments',function(req,res,next){
     if(pageCount==undefined){ pageCount = 10; }
     if(pagingNumber==undefined){ pagingNumber = 1; }
 
+    //페이징 쿼리 추가 필요 (2017-10-14)
     Department.find({delete_yn:'N'}).sort('name').exec(function(error,results){
       if(error){
         return next(error);
       }
       res.json(results);
+      //총 건수 , 총 페이지 갯수 , 현재페이지 갯수 json에서 포함해서 화면에 전달하기
     });
 });
 
@@ -78,7 +80,7 @@ router.put("/mis/1.0/departments/:departmentCode",function(req,res,next){
     Department.findOne({
       code:req.params.departmentCode
     }).exec(function(error,searchDepartment){
-      searchDepartment.name = req.body.DepartmentCode || searchDepartment.name;
+      searchDepartment.name = req.body.DepartmentName || searchDepartment.name;
       searchDepartment.representation = req.body.DepartmentRepresentation || searchDepartment.representation;
       searchDepartment.description = req.body.DepartmentDescription || searchDepartment.description;
       searchDepartment.update_date = new Date('YYYY-MM-DD');
