@@ -10,6 +10,7 @@ var cors = require('cors'); //크로스 도메인 관련 객체
 require('./lib/connection');
 //route 호출
 var employees = require('./routes/employees');
+var departments = require('./routes/departments');
 var login = require('./routes/login');
 
 var app = express();
@@ -23,7 +24,9 @@ app.use(cors());
 
 // 애플리케이션 라우트
 app.use(login);
+app.use(departments);
 app.use(employees);
+
 
 // 404를 잡아 오류 처리기로 전달
 app.use(function(req, res, next) {

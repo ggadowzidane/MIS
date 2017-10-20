@@ -12,8 +12,8 @@ var DepartmentSchema = new Schema({
   },
   representation:{
     type:String,
-    requried:true
-  }
+    required:true
+  },
   description:{
     type:String
   },

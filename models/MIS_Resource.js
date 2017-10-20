@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+//자원은 해당 결재 넣는 insert_employee_code별 code가 unique하다.
 var ResourceSchema = new Schema({
   code:{
     type:Number,

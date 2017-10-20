@@ -25,7 +25,7 @@ var ApprovalSchema = new Schema({
     //default add
   },
   reference_employee_code:{
-    type:[String]
+    type:[String],
     required:true
   },
   approval_employee_code:{
@@ -35,11 +35,11 @@ var ApprovalSchema = new Schema({
   request_description:{
     type:String,
     required:true
-  }
+  },
   approval_description:{
     type:String,
     required:true
-  }
+  },
   hold_description:{
     type:String,
     required:true
@@ -61,11 +61,7 @@ var ApprovalSchema = new Schema({
     type:Date,
     default:new Date()
   },
-  approval_date{
-    type:Date,
-    deafult:new Date();
-  },
-  approval_data{
+  approval_data:{
     type:[String] //결재 데이터 문자열 배열로 가지고 있을
   }
 });

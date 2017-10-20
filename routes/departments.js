@@ -1,6 +1,6 @@
 var express = require('express');
 var mongoose = require('mongoose');
-var Department = require('Department');
+var Department = mongoose.model('Department');
 
 var router = express.Router();
 
@@ -14,7 +14,7 @@ router.get('/mis/1.0/departments',function(req,res,next){
     if(pagingNumber==undefined){ pagingNumber = 1; }
 
     //페이징 쿼리 추가 필요 (2017-10-14)
-    Department.find({delete_yn:'N'}).sort('name').exec(function(error,results){
+    Department.find({delete_yn:'N'}).sort('name').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
       if(error){
         return next(error);
       }
@@ -47,29 +47,29 @@ router.post('/mis/1.0/departments',function(req,res,next){
     }else{
       newCode = results[0].code;
     }
-  });
 
-  var newDepartment = new Department({
-                                      code:newCode,
-                                      name:req.body.DeparmtnetName,
-                                      representation:req.body.DepartmentRepresentation,
-                                      description:req.body.DepartmentDescription,
-                                      insert_date:new Date('YYYY-MM-dd'),
-                                      update_date:new Date('YYYY-MM-dd'),
-                                      delete_yn:'N'
-                                    });
+    var newDepartment = new Department({
+                                        code:(newCode+1),
+                                        name:req.body.DepartmentName,
+                                        representation:req.body.DepartmentRepresentation,
+                                        description:req.body.DepartmentDescription,
+                                        insert_date:new Date(),
+                                        update_date:new Date(),
+                                        delete_yn:'N'
+                                      });
 
-  newEmployee.save(function(error,Deparmtnet){
-    if(error){
-      return next(error);
-    }
-    Department.findOne({
-      code:department.code
-    }).exec(function(error,results){
+    newDepartment.save(function(error,department){
       if(error){
         return next(error);
       }
-      res.json(results);
+      Department.findOne({
+        code:department.code
+      }).exec(function(error,results){
+        if(error){
+          return next(error);
+        }
+        res.json(results);
+      });
     });
   });
 
@@ -83,7 +83,17 @@ router.put("/mis/1.0/departments/:departmentCode",function(req,res,next){
       searchDepartment.name = req.body.DepartmentName || searchDepartment.name;
       searchDepartment.representation = req.body.DepartmentRepresentation || searchDepartment.representation;
       searchDepartment.description = req.body.DepartmentDescription || searchDepartment.description;
-      searchDepartment.update_date = new Date('YYYY-MM-DD');
+      searchDepartment.update_date = new Date();
+
+      searchDepartment.save(function(error,department){
+        if(error){
+          return next(error);
+        }
+        var updateYnVal = true;   //이메일 중복 체크 여부
+        if(department == null) {  updateYnVal = false;   }
+        //회원정보수정 성공여부 리턴
+        res.json({updateYn:updateYnVal});
+      });
     });
 });
 
@@ -92,7 +102,14 @@ router.delete("/mis/1.0/departments/:departmentCode",function(req,res,next){
   Department.findOne({
     code:req.params.departmentCode
   }).exec(function(error,searchDepartment){
+    if(error) return next(error);
     searchDepartment.delete_yn = 'Y';
-    searchDepartment.update_date = new Date('YYYY-MM-DD');
+    searchDepartment.update_date = new Date();
+    searchDepartment.save(function(error,department){
+      if(error) return next(error);
+      res.json('delete success');
+    });
   });
 });
+
+module.exports = router;

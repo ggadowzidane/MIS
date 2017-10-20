@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+//휴가는 해당 employee_code 별 code가 unique하다.
 var VacationSchema = new Schema({
   code:{
     type:Number,
@@ -53,7 +54,7 @@ var VacationSchema = new Schema({
   insert_date:{
     type:Date,
     default:new Date()
-  }
+  },
   update_date:{
     type:Date,
     default:new Date()

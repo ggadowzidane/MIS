@@ -1,7 +1,7 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var Employee = mongoose.model('Employee');
-//var Department = mongoose.model('Department');
+
 var router = express.Router();
 
 //Employee 전체 조회 router
