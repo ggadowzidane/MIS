@@ -81,7 +81,7 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
     insert_date:new Date(),
     //나중에 휴가에 들어갈 데이터들을 문자열 변수로 지정
     approval_datas:[
-                    newCode,  // 코드 (결재코드랑 휴가코드는 달라야한다. 휴가코드는 사원의 휴가코드가 unique 해야할듯 수정필요)
+                    //newCode,  // 결재코드는 결재완료 처리 후 각 테이블의 코드값을 따서 사용
                     req.body.ApprovalVacationType,  //타입
                     req.body.ApprovalStartDate, //시작기간
                     req.body.ApprovalEndDate, //끝기간
@@ -113,14 +113,14 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
 });
 
 //수정항목 : 휴가 시작 , 휴가 종료 , 연락처 , 참조자 목록 , 휴가 사유 , 승인자 목록
-//휴가결재수정
-router.put("/vacations/approvals/:approvalCode",function(req,res,next){
+//휴가결재 정보수정
+router.put("/mis/1.0/approvals/:approvalCode",function(req,res,next){
   Approval.findOne({
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
-    searchApproval.approval_datas[2] = req.body.start_date || searchApproval.approval_datas[2];   //휴가 시작일자
-    searchApproval.approval_datas[3] = req.body.end_date || searchApproval.approval_datas[3];   //휴가 종료일자
-    searchApproval.approval_datas[4] = req.body.employee_phone || searchApproval.approval_datas[4];   //연락처
+    searchApproval.approval_datas[1] = req.body.start_date || searchApproval.approval_datas[2];   //휴가 시작일자
+    searchApproval.approval_datas[2] = req.body.end_date || searchApproval.approval_datas[3];   //휴가 종료일자
+    searchApproval.approval_datas[3] = req.body.employee_phone || searchApproval.approval_datas[4];   //연락처
     searchApproval.reference_employee_id = req.body.reference_employee_id || searchApproval.reference_employee_id;   //참조자목록
     searchApproval.request_description = req.body.request_description || searchApproval.request_description;   //요청 사유
     searchApproval.approval_employee_id = req.body.approval_employee_id || searchApproval.approval_employee_id;   //승인자목록
@@ -134,4 +134,13 @@ router.put("/vacations/approvals/:approvalCode",function(req,res,next){
       res.json({updateYn:updateYnVal});
     });
   })
+});
+
+//휴가결재 심사
+router.put("/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
+  Approval.findOne({
+    code:req.params.approvalCode
+  }).exec(function(error,searchApproval){
+
+  });
 });

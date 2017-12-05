@@ -14,10 +14,10 @@ var EmployeeSchema = new Schema({
     required:true
   },
   department:{
-    //type: Schema.Types.ObjectId,
-    //ref: 'Department'
+    type: Schema.Types.ObjectId,
+    ref: 'Department'
     /*Department 관련 추가 시 수정 예정 2017-08-31*/
-    type:String
+    //type:String
   },
   join_yyyymm:{
     type:Date,
