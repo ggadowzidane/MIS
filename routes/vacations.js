@@ -91,9 +91,7 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
                     'Y', //approval_yn
                     req.body.ApprovalEmployeeCode, //employee_code
                     new Date(), // approval_date
-                    '', //return_description
-                    new Date(), //insert_date
-                    new Date() // update_date 수정할때 데이터 수정
+                    new Date() //insert_date
                   ]
   });
 
@@ -138,9 +136,59 @@ router.put("/mis/1.0/approvals/:approvalCode",function(req,res,next){
 
 //휴가결재 심사
 router.put("/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
+  var approvalUpdateState = req.body.approval_Update_State; // 심사할 상태 (승인 또는 반려) 대운이한테 명시
+  var newCode=0;
   Approval.findOne({
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
+
+    searchApproval.state = req.body.approval_state;
+    searchApproval.approval_description = req.body.approval_description;
+    searchApproval.save(function(error,approval){ //결재 테이블 update
+      if(error){
+        return next(error);
+      }
+      //결재 테이블 update 후 휴가 결재 테이블에 insert
+      Vacation.find().sort({'code':-1}).limit(1).exec(function(error,results){ //신규 결재 코드 준비값
+        if(results==null){
+          newCode = 0;
+        }else{
+          newCode = (results[0].code+1);
+        }
+      });
+
+      var newVacation = new Vacation({
+          code  : newCode,
+          type  : searchApproval.approval_datas[0] , // 타입
+          start_date :  searchApproval.approval_datas[1] ,  // 휴가 시작 일
+          end_date :  searchApproval.approval_datas[2] ,  // 휴가 종료 일
+          request_description : searchApproval.approval_datas[3] ,  // 휴가 사유
+          employee_phone : searchApproval.approval_datas[4] ,  // 휴가자 연락처
+          request_date : searchApproval.approval_datas[5] ,  // 휴가 요청 날짜
+          approval_yn : searchApproval.approval_datas[6] ,  // 휴가 승인 여부
+          employee_code : searchApproval.approval_datas[7] ,  // 휴가 직원 아이디
+          approval_date : searchApproval.approval_datas[8] ,  // 휴가 승인 날짜
+          return_description : req.body.approval_description , // 반려 사유 ( 승인 일 경우에는 승인 사유가 없는데 그냥 심사 사유로 변경하는게 어떨지 확인하기)
+          insert_date : searchApproval.approval_datas[9] ,  // 휴가 요청 날짜
+          update_date : new Date()  // 휴가 요청 날짜
+      });
+
+      //결재 update , 휴가는 insert 어느것을 리턴할지는 협의해서 정하도록
+      //임시로 결재 찾아서 리턴
+      newVacation.save(function(error.vacation){
+        if(error){
+          return next(error);
+        }
+        approval.findOne({
+          code:approval.code
+        }).exec(function(error,results){
+          if(error){}
+            return next(error);
+          }
+          res.json(results);
+        });
+      });
+    });
 
   });
 });
