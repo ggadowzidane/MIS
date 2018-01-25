@@ -19,12 +19,13 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
 
   if(pageCount==undefined) { pageCount = 10; } //값이 넘어오지 않을 경우 기본값 셋팅
   if(pagingNumber==undefined) { pagingNumber = 1; }//값이 넘어오지 않을 경우 기본값 셋팅
-
+  console.dir("employeeId :: " + emploeeId);
   //approvalState : 전체보기(0),기안(1),승인(2),반려(3)
   //휴가결재 목록조회에서는 결재에 대한 정보만 나타낸다. (TABLE : APPROVAL)
   //완료된 휴가 리스트들은 휴가 목록조회에서 보여준다. (TABLE : VACATION)
   Approval.find({
     //or 조건 추가예정 line18
+    /*
     $or:[
         {"request_employee_id":req.query.employeeId},
         {"reference_employee_id":req.query.employeeId},
@@ -34,6 +35,8 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
     request_employee_code:employeeId,
     state:approvalState,
     type:1  //결재타입 1은 휴가
+    */
+    //request_employee_id:employee_id
   }).sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(req,res,next){
     if(error){
       return next(error);
@@ -192,3 +195,5 @@ router.put("/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
 
   });
 });
+
+module.exports = router;

@@ -25,3 +25,5 @@ router.get('/mis/1.0/approvals/aprEmployees',function(req,res,next){
     res.json(results);
   });
 });
+
+module.exports = router;
