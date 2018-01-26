@@ -1,7 +1,7 @@
 var express = require('express');
 var mongoose = require('mongoose');
-var Approval = require('Approval');
-var Employee = require('Employee');
+var Approval = mongoose.model('Approval');
+var Employee = mongoose.model('Employee');
 var router = express.Router();
 
 //결재 참조자 목록 조회

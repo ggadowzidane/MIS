@@ -1,17 +1,19 @@
 var express = require('express');
 var mongoose = require('mongoose');
-var Vacation = require('Vacation');
-var Approval = require('Approval');
+var Vacation = mongoose.model('Vacation');
+var Approval = mongoose.model('Approval');
 
 var router = express.Router();
 
 //휴가결재 목록조회
 router.get('/mis/1.0/vacations/approvals',function(req,res,next){
+
   var approvalStartDate = req.query.approvalStartDate;
   var approvalEndDate = req.query.approvalEndDate;
   var employeeName = req.query.employeeName;  // employeeId로 변경해야 할듯하다. Name은 동명이인일 경우 문제가 발생 가능
   var employeeId = req.query.employeeId;  // employeeId로 변경해야 할듯하다. Name은 동명이인일 경우 문제가 발생 가능 (restfulAPI도 수정, 테이블 명세서도 변경예정)
   var approvalState = req.query.approvalState;
+  var nnn = req.query.nnn;
 
   //이것도 페이징 처리 하는것인지 확인하여 queryString restfulAPI에도 추가하는지 확인
   var pageCount = parseInt(req.query.PageCount);  // 한페이지에 출력 갯수
@@ -19,7 +21,7 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
 
   if(pageCount==undefined) { pageCount = 10; } //값이 넘어오지 않을 경우 기본값 셋팅
   if(pagingNumber==undefined) { pagingNumber = 1; }//값이 넘어오지 않을 경우 기본값 셋팅
-  console.dir("employeeId :: " + emploeeId);
+  console.dir("employeeId :: " + employeeId + "/nnn::"+nnn);
   //approvalState : 전체보기(0),기안(1),승인(2),반려(3)
   //휴가결재 목록조회에서는 결재에 대한 정보만 나타낸다. (TABLE : APPROVAL)
   //완료된 휴가 리스트들은 휴가 목록조회에서 보여준다. (TABLE : VACATION)
@@ -32,12 +34,11 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
         {"approval_employee_id":req.query.employeeId}
       ],  // 결재요청직원 , 결재참조직원 , 결재승인직원아이디 전부 포함된 조건
     request_date:{"$gte":approvalStartDate, "$lt":approvalEndDate},
-    request_employee_code:employeeId,
-    state:approvalState,
-    type:1  //결재타입 1은 휴가
     */
-    //request_employee_id:employee_id
-  }).sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(req,res,next){
+    request_employee_code:employeeId,
+    //state:approvalState,
+    type:1  //결재타입 1은 휴가
+  }).sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
     if(error){
       return next(error);
     }
@@ -76,7 +77,7 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
     type:req.body.ApprovalType,
     state:"1",
     request_employee_code:req.body.ApprovalRequestEmployeeCode,
-    request_date:new Date();
+    request_date:new Date(),
     reference_employee_code:req.body.ApprovalReferenceEmployeeCode,
     approval_employee_code:req.body.ApprovalEmployeeCode,
     request_description:req.body.ApprovalRequestDescription,
@@ -178,7 +179,7 @@ router.put("/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
 
       //결재 update , 휴가는 insert 어느것을 리턴할지는 협의해서 정하도록
       //임시로 결재 찾아서 리턴
-      newVacation.save(function(error.vacation){
+      newVacation.save(function(error,vacation){
         if(error){
           return next(error);
         }
@@ -187,7 +188,6 @@ router.put("/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
         }).exec(function(error,results){
           if(error){}
             return next(error);
-          }
           res.json(results);
         });
       });
