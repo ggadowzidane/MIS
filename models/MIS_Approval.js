@@ -14,7 +14,7 @@ var ApprovalSchema = new Schema({
     type:String,
     required:true
   },
-  request_employee_code:{
+  request_employee_id:{
     type:String,
     required:true
   },
@@ -24,11 +24,11 @@ var ApprovalSchema = new Schema({
     default:new Date()
     //default add
   },
-  reference_employee_code:{
+  reference_employee_id:{
     type:[String],
     required:true
   },
-  approval_employee_code:{
+  approval_employee_id:{
     type:String,
     required:true
   },
@@ -38,11 +38,9 @@ var ApprovalSchema = new Schema({
   },
   approval_description:{
     type:String,
-    required:true
   },
   hold_description:{
     type:String,
-    required:true
   },
   approval_date:{
     type:Date,
