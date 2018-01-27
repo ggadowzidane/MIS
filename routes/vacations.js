@@ -41,6 +41,10 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
 
   searchCond["type"] = "1";
 
+  if(approvalStartDate!=null && approvalEndDate!=null){
+    searchCond['request_date']= {"$gte":new Date(approvalStartDate), "$lt": new Date(approvalEndDate)};
+  }
+
   /*
   Approval.find({
     //or 조건 추가예정 line18
@@ -169,7 +173,7 @@ router.put("/mis/1.0/approvals/:approvalCode",function(req,res,next){
 
 //휴가결재 심사
 router.put("/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
-  var approvalUpdateState = req.body.approval_Update_State; // 심사할 상태 (승인 또는 반려) 대운이한테 명시
+  var approvalUpdateState = req.body.approvalUpdateState; // 심사할 상태 (승인 또는 반려) 대운이한테 명시
   var newCode=0;
   Approval.findOne({
     code:req.params.approvalCode
