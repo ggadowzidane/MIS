@@ -20,8 +20,7 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
 
   if(pageCount==undefined) { pageCount = 10; } //값이 넘어오지 않을 경우 기본값 셋팅
   if(pagingNumber==undefined) { pagingNumber = 1; }//값이 넘어오지 않을 경우 기본값 셋팅
-  console.dir("approvalStartDate :: " + new Date(approvalStartDate) + "/approvalEndDate::"+new Date(approvalEndDate));
-  console.dir("employeeId :: " + employeeId + "/approvalState::"+approvalState);
+  //console.dir("employeeId :: " + employeeId + "/approvalState::"+approvalState);
   //approvalState : 전체보기(0),기안(1),승인(2),반려(3)
   //휴가결재 목록조회에서는 결재에 대한 정보만 나타낸다. (TABLE : APPROVAL)
   //완료된 휴가 리스트들은 휴가 목록조회에서 보여준다. (TABLE : VACATION)
@@ -169,17 +168,17 @@ router.put("/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
 
       var newVacation = new Vacation({
           code  : newCode,
-          type  : searchApproval.approval_datas[0] , // 타입
-          start_date :  searchApproval.approval_datas[1] ,  // 휴가 시작 일
-          end_date :  searchApproval.approval_datas[2] ,  // 휴가 종료 일
-          request_description : searchApproval.approval_datas[3] ,  // 휴가 사유
-          employee_phone : searchApproval.approval_datas[4] ,  // 휴가자 연락처
-          request_date : searchApproval.approval_datas[5] ,  // 휴가 요청 날짜
-          approval_yn : searchApproval.approval_datas[6] ,  // 휴가 승인 여부
-          employee_code : searchApproval.approval_datas[7] ,  // 휴가 직원 아이디
-          approval_date : searchApproval.approval_datas[8] ,  // 휴가 승인 날짜
+          type  : searchApproval.approval_data[0] , // 타입
+          start_date :  searchApproval.approval_data[1] ,  // 휴가 시작 일
+          end_date :  searchApproval.approval_data[2] ,  // 휴가 종료 일
+          request_description : searchApproval.approval_data[3] ,  // 휴가 사유
+          employee_phone : searchApproval.approval_data[4] ,  // 휴가자 연락처
+          request_date : searchApproval.approval_data[5] ,  // 휴가 요청 날짜
+          approval_yn : searchApproval.approval_data[6] ,  // 휴가 승인 여부
+          employee_code : searchApproval.approval_data[7] ,  // 휴가 직원 아이디
+          approval_date : searchApproval.approval_data[8] ,  // 휴가 승인 날짜
           return_description : req.body.approval_description , // 반려 사유 ( 승인 일 경우에는 승인 사유가 없는데 그냥 심사 사유로 변경하는게 어떨지 확인하기)
-          insert_date : searchApproval.approval_datas[9] ,  // 휴가 요청 날짜
+          insert_date : searchApproval.approval_data[9] ,  // 휴가 요청 날짜
           update_date : new Date()  // 휴가 요청 날짜
       });
 
