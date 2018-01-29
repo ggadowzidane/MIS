@@ -23,54 +23,38 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
   //approvalState : 전체보기(0),기안(1),승인(2),반려(3)
   //휴가결재 목록조회에서는 결재에 대한 정보만 나타낸다. (TABLE : APPROVAL)
   //완료된 휴가 리스트들은 휴가 목록조회에서 보여준다. (TABLE : VACATION)
-  /*
-  var searchCond = {}
-  if(approvalStartDate!=null && approvalEndDate!=null){
-    searchCond['request_date']={"$gte":new Date(2018,1,24), "$lt": new Date(2018,1,26)};
-  }
-  */
+
   var searchCond = {};
 
-  if(employeeId !=null && employeeId != ""){
-    searchCond["request_employee_id"] = employeeId;
-  }
-
   if(approvalState !=null && approvalState != ""){
+    console.dir('state check ');
     searchCond["state"] = approvalState;
   }
 
   searchCond["type"] = "1";
 
   if(approvalStartDate!=null && approvalEndDate!=null){
+    console.dir('date check ');
     searchCond['request_date']= {"$gte":new Date(approvalStartDate), "$lt": new Date(approvalEndDate)};
   }
 
-  /*
   Approval.find({
-    //or 조건 추가예정 line18
-
-    //$or:[
-    //    {"request_employee_id":req.query.employeeId},
-    //    {"reference_employee_id":req.query.employeeId},
-    //    {"approval_employee_id":req.query.employeeId}
-    //  ],  // 결재요청직원 , 결재참조직원 , 결재승인직원아이디 전부 포함된 조건
-
-    //'request_date':{"$gte":new Date(2018,1,24), "$lt": new Date(2018,1,26)}
-    "request_employee_id":employeeId,
-    "state":approvalState,
-    'type':"1"  //결재타입 1은 휴가
-  }).sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
+    $or:[
+          {"request_employee_id":req.query.employeeId},
+          {"reference_employee_id":req.query.employeeId},
+          {"approval_employee_id":req.query.employeeId}
+        ]  // 결재요청직원 , 결재참조직원 , 결재승인직원아이디 전부 포함된 조건
+  }).exec(function(error,searchApproval){
     if(error){
       return next(error);
     }
-    res.json(results);
-  });
-  */
-  Approval.find(searchCond).sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
-    if(error){
-      return next(error);
-    }
-    res.json(results);
+
+    searchApproval.find(searchCond).sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
+      if(error){
+        return next(error);
+      }
+      res.json(results);
+    });
   });
 });
 

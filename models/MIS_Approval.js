@@ -60,7 +60,9 @@ var ApprovalSchema = new Schema({
     default:new Date()
   },
   approval_data:{
-    type:[String] //결재 데이터 문자열 배열로 가지고 있을
+    //type:[String] //결재 데이터 문자열 배열로 가지고 있을
+    type : mongoose.Schema.Types.Mixed
+    //결재데이터를 객체 형태로 가지고 있도록 처리 2018-01-29
   }
 });
 
