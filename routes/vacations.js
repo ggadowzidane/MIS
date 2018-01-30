@@ -24,38 +24,33 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
   //휴가결재 목록조회에서는 결재에 대한 정보만 나타낸다. (TABLE : APPROVAL)
   //완료된 휴가 리스트들은 휴가 목록조회에서 보여준다. (TABLE : VACATION)
 
-  var searchCond = {};
-
-  if(approvalState !=null && approvalState != ""){
-    console.dir('state check ');
-    searchCond["state"] = approvalState;
-  }
-
-  searchCond["type"] = "1";
-
-  if(approvalStartDate!=null && approvalEndDate!=null){
-    console.dir('date check ');
-    searchCond['request_date']= {"$gte":new Date(approvalStartDate), "$lt": new Date(approvalEndDate)};
-  }
-
-  Approval.find({
+  var approvalQuery = Approval.find({
     $or:[
           {"request_employee_id":req.query.employeeId},
           {"reference_employee_id":req.query.employeeId},
           {"approval_employee_id":req.query.employeeId}
         ]  // 결재요청직원 , 결재참조직원 , 결재승인직원아이디 전부 포함된 조건
-  }).exec(function(error,searchApproval){
+  });
+
+  approvalQuery.where('type').equals(1);
+
+  if(approvalState !=null && approvalState != ""){
+    console.dir('state check in vacation search');
+    approvalQuery.where('state').equals(approvalState);
+  }
+
+  if(approvalStartDate!=null && approvalEndDate!=null){
+    console.dir('date check in vacation search');
+    approvalQuery.where('request_date').gt(new Date(approvalStartDate)).lt(new Date(approvalEndDate));
+  }
+
+  approvalQuery.sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
     if(error){
       return next(error);
     }
-
-    searchApproval.find(searchCond).sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
-      if(error){
-        return next(error);
-      }
-      res.json(results);
-    });
+    res.json(results);
   });
+
 });
 
 //휴가결재 상세조회
@@ -98,19 +93,19 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
       approval_date:new Date(req.body.ApprovalDate),
       insert_date:new Date(),
       //나중에 휴가에 들어갈 데이터들을 문자열 변수로 지정
-      approval_data:[
+      approval_data:{
                       //newCode,  // 결재코드는 결재완료 처리 후 각 테이블의 코드값을 따서 사용
-                      req.body.ApprovalVacationType,  //타입
-                      req.body.ApprovalStartDate, //시작기간
-                      req.body.ApprovalEndDate, //끝기간
-                      req.body.ApprovalRequestDescription,
-                      req.body.ApprovalEmployeePhone,
-                      new Date(), //request_Date
-                      'Y', //approval_yn
-                      req.body.ApprovalEmployeeId, //employee_id
-                      new Date(), // approval_date
-                      new Date() //insert_date
-                    ]
+                      "ApprovalVacationType":req.body.ApprovalVacationType,  //타입
+                      "ApprovalStartDate":req.body.ApprovalStartDate, //시작기간
+                      "ApprovalEndDate":req.body.ApprovalEndDate, //끝기간
+                      "ApprovalRequestDescription":req.body.ApprovalRequestDescription,
+                      "ApprovalEmployeePhone":req.body.ApprovalEmployeePhone,
+                      "RequestDate":new Date(), //request_Date
+                      "ApprovalYn":'Y', //approval_yn
+                      "ApprovalEmployeeId":req.body.ApprovalEmployeeId, //employee_id
+                      "ApprovalDate":new Date(), // approval_date
+                      "InsertDate":new Date() //insert_date
+                    }
     });
 
     newApproval.save(function(error,approval){
