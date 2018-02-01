@@ -80,7 +80,8 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
       console.dir('approval post code create 2');
     }
     console.dir("new Code :: " + newCode);
-
+    console.dir("req body:::");
+    console.dir(req.body);
     var newApproval = new Approval({
       code:newCode,
       type:"1", //휴가는 1
@@ -95,16 +96,16 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
       //나중에 휴가에 들어갈 데이터들을 문자열 변수로 지정
       approval_data:{
                       //newCode,  // 결재코드는 결재완료 처리 후 각 테이블의 코드값을 따서 사용
-                      "ApprovalVacationType":req.body.ApprovalVacationType,  //타입
-                      "ApprovalStartDate":req.body.ApprovalStartDate, //시작기간
-                      "ApprovalEndDate":req.body.ApprovalEndDate, //끝기간
-                      "ApprovalRequestDescription":req.body.ApprovalRequestDescription,
-                      "ApprovalEmployeePhone":req.body.ApprovalEmployeePhone,
-                      "RequestDate":new Date(), //request_Date
-                      "ApprovalYn":'Y', //approval_yn
-                      "ApprovalEmployeeId":req.body.ApprovalEmployeeId, //employee_id
-                      "ApprovalDate":new Date(), // approval_date
-                      "InsertDate":new Date() //insert_date
+                      ApprovalVacationType:req.body.ApprovalVacationType,  //타입
+                      ApprovalStartDate:req.body.ApprovalStartDate, //시작기간
+                      ApprovalEndDate:req.body.ApprovalEndDate, //끝기간
+                      ApprovalRequestDescription:req.body.ApprovalRequestDescription,
+                      ApprovalEmployeePhone:req.body.ApprovalEmployeePhone,
+                      RequestDate:new Date(), //request_Datejjadf
+                      ApprovalYn:'Y', //approval_yn
+                      ApprovalEmployeeId:req.body.ApprovalEmployeeId, //employee_id
+                      ApprovalDate:new Date(), // approval_date
+                      InsertDate:new Date() //insert_date
                     }
     });
 
@@ -132,10 +133,12 @@ router.put("/mis/1.0/approvals/:approvalCode",function(req,res,next){
   Approval.findOne({
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
-    searchApproval.approval_data[1] = req.body.start_date || searchApproval.approval_data[2];   //휴가 시작일자
-    searchApproval.approval_data[2] = req.body.end_date || searchApproval.approval_data[3];   //휴가 종료일자
-    searchApproval.approval_data[3] = req.body.employee_phone || searchApproval.approval_data[4];   //연락처
-    searchApproval.reference_employee_id = req.body.reference_employee_id || searchApproval.reference_employee_id;   //참조자목록
+    console.dir("111:"+searchApproval.approval_data["ApprovalStartDate"]);
+
+    searchApproval.approval_data["ApprovalStartDate"] = req.body.start_date || searchApproval.approval_data["ApprovalStartDate"];   //휴가 시작일자
+    searchApproval.approval_data["ApprovalEndDate"] = req.body.end_date || searchApproval.approval_data["ApprovalStartDate"];   //휴가 종료일자
+    searchApproval.approval_data["ApprovalEmployeePhone"] = req.body.employee_phone || searchApproval.approval_data["ApprovalStartDate"];   //연락처
+    searchApproval.reference_employee_id = req.body.reference_employese_id || searchApproval.reference_employee_id;   //참조자목록
     searchApproval.request_description = req.body.request_description || searchApproval.request_description;   //요청 사유
     searchApproval.approval_employee_id = req.body.approval_employee_id || searchApproval.approval_employee_id;   //승인자목록
     searchApproval.save(function(error,approval){
@@ -175,18 +178,18 @@ router.put("/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
 
       var newVacation = new Vacation({
           code  : newCode,
-          type  : searchApproval.approval_data[0] , // 타입
-          start_date :  searchApproval.approval_data[1] ,  // 휴가 시작 일
-          end_date :  searchApproval.approval_data[2] ,  // 휴가 종료 일
-          request_description : searchApproval.approval_data[3] ,  // 휴가 사유
-          employee_phone : searchApproval.approval_data[4] ,  // 휴가자 연락처
-          request_date : searchApproval.approval_data[5] ,  // 휴가 요청 날짜
-          approval_yn : searchApproval.approval_data[6] ,  // 휴가 승인 여부
-          employee_code : searchApproval.approval_data[7] ,  // 휴가 직원 아이디
-          approval_date : searchApproval.approval_data[8] ,  // 휴가 승인 날짜
+          type  : searchApproval.approval_data.get("ApprovalVacationType") , // 타입
+          start_date :  searchApproval.approval_data.get("ApprovalStartDate") ,  // 휴가 시작 일
+          end_date :  searchApproval.approval_data.get("ApprovalEndDate") ,  // 휴가 종료 일
+          request_description : searchApproval.approval_data.get("ApprovalRequestDescription") ,  // 휴가 사유
+          employee_phone : searchApproval.approval_data.get("ApprovalEmployeePhone") ,  // 휴가자 연락처
+          request_date : searchApproval.approval_data.get("RequestDate") ,  // 휴가 요청 날짜
+          approval_yn : searchApproval.approval_data.get("ApprovalYn") ,  // 휴가 승인 여부
+          employee_code : searchApproval.approval_data.get("ApprovalEmployeeId") ,  // 휴가 직원 아이디
+          approval_date : searchApproval.approval_data.get("ApprovalDate"),  // 휴가 승인 날짜
           return_description : req.body.approval_description , // 반려 사유 ( 승인 일 경우에는 승인 사유가 없는데 그냥 심사 사유로 변경하는게 어떨지 확인하기)
-          insert_date : searchApproval.approval_data[9] ,  // 휴가 요청 날짜
-          update_date : new Date()  // 휴가 요청 날짜
+          insert_date : searchApproval.approval_data.get("InsertDate") ,  // 휴가 요청 날짜
+          update_date : new Date()  // 결재심사 일자
       });
 
       //결재 update , 휴가는 insert 어느것을 리턴할지는 협의해서 정하도록
