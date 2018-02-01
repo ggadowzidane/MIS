@@ -26,7 +26,7 @@ var VacationSchema = new Schema({
     required:true
   },
   employee_phone:{
-    type:Number,
+    type:String,
     required:true
   },
   request_date:{
@@ -38,7 +38,7 @@ var VacationSchema = new Schema({
     type:String,
     required:true
   },
-  employee_code:{
+  employee_id:{
     type:Schema.Types.ObjectId,
     ref:'Employee'
   },

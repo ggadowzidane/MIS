@@ -14,8 +14,8 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
   var approvalState = req.query.approvalState;
 
   //이것도 페이징 처리 하는것인지 확인하여 queryString restfulAPI에도 추가하는지 확인
-  var pageCount = parseInt(req.query.PageCount);  // 한페이지에 출력 갯수
-  var pagingNumber = parseInt(req.query.PagingNumber);  // 페이지 번호
+  var pageCount = parseInt(req.query.pageCount);  // 한페이지에 출력 갯수
+  var pagingNumber = parseInt(req.query.pagingNumber);  // 페이지 번호
 
   if(pageCount==undefined) { pageCount = 10; } //값이 넘어오지 않을 경우 기본값 셋팅
   if(pagingNumber==undefined) { pagingNumber = 1; }//값이 넘어오지 않을 경우 기본값 셋팅
@@ -34,12 +34,12 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
 
   approvalQuery.where('type').equals(1);
 
-  if(approvalState !=null && approvalState != ""){
+  if(approvalState != ""){
     console.dir('state check in vacation search');
     approvalQuery.where('state').equals(approvalState);
   }
 
-  if(approvalStartDate!=null && approvalEndDate!=null){
+  if(approvalStartDate!="" && approvalEndDate!=""){
     console.dir('date check in vacation search');
     approvalQuery.where('request_date').gt(new Date(approvalStartDate)).lt(new Date(approvalEndDate));
   }
@@ -55,7 +55,6 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
 
 //휴가결재 상세조회
 router.get("/mis/1.0/vacations/approvals/:approvalCode",function(req,res,next){
-  console.dir('approvalCode :: '+req.params.approvalCode);
   Approval.findOne({
     code:req.params.approvalCode
   }).exec(function(error,results){
@@ -74,14 +73,9 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
   Approval.find().sort({'code':-1}).limit(1).exec(function(error,results){
     if(results==null){
       newCode = 0;
-      console.dir('approval post code create 1');
     }else{
       newCode = (results[0].code)+1;
-      console.dir('approval post code create 2');
     }
-    console.dir("new Code :: " + newCode);
-    console.dir("req body:::");
-    console.dir(req.body);
     var newApproval = new Approval({
       code:newCode,
       type:"1", //휴가는 1
@@ -133,14 +127,18 @@ router.put("/mis/1.0/approvals/:approvalCode",function(req,res,next){
   Approval.findOne({
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
-    console.dir("111:"+searchApproval.approval_data["ApprovalStartDate"]);
-
-    searchApproval.approval_data["ApprovalStartDate"] = req.body.start_date || searchApproval.approval_data["ApprovalStartDate"];   //휴가 시작일자
-    searchApproval.approval_data["ApprovalEndDate"] = req.body.end_date || searchApproval.approval_data["ApprovalStartDate"];   //휴가 종료일자
-    searchApproval.approval_data["ApprovalEmployeePhone"] = req.body.employee_phone || searchApproval.approval_data["ApprovalStartDate"];   //연락처
-    searchApproval.reference_employee_id = req.body.reference_employese_id || searchApproval.reference_employee_id;   //참조자목록
+    //console.dir("111:"+searchApproval.approval_data["ApprovalEmployeePhone"]+"@@"+req.body.employee_phone);
+    if(req.body.start_date!="" || req.body.end_date!="" || req.body.employee_phone!=""){
+      searchApproval.approval_data["ApprovalStartDate"] = req.body.start_date || searchApproval.approval_data["ApprovalStartDate"];   //휴가 시작일자
+      searchApproval.approval_data["ApprovalEndDate"] = req.body.end_date || searchApproval.approval_data["ApprovalEndDate"];   //휴가 종료일자
+      searchApproval.approval_data["ApprovalEmployeePhone"] = req.body.employee_phone || searchApproval.approval_data["ApprovalEmployeePhone"];   //연락처
+      searchApproval.markModified('approval_data');
+    }
+    searchApproval.reference_employee_id = req.body.reference_employee_id || searchApproval.reference_employee_id;   //참조자목록
     searchApproval.request_description = req.body.request_description || searchApproval.request_description;   //요청 사유
     searchApproval.approval_employee_id = req.body.approval_employee_id || searchApproval.approval_employee_id;   //승인자목록
+
+    console.dir("abab::"+searchApproval.approval_data["ApprovalEmployeePhone"]);
     searchApproval.save(function(error,approval){
       if(error){
         return next(error);
@@ -154,8 +152,7 @@ router.put("/mis/1.0/approvals/:approvalCode",function(req,res,next){
 });
 
 //휴가결재 심사
-router.put("/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
-  var approvalUpdateState = req.body.approvalUpdateState; // 심사할 상태 (승인 또는 반려) 대운이한테 명시
+router.put("/mis/1.0/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
   var newCode=0;
   Approval.findOne({
     code:req.params.approvalCode
@@ -172,40 +169,42 @@ router.put("/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
         if(results==null){
           newCode = 0;
         }else{
-          newCode = (results[0].code+1);
+          newCode = (results[0].code)+1;
         }
-      });
 
-      var newVacation = new Vacation({
-          code  : newCode,
-          type  : searchApproval.approval_data.get("ApprovalVacationType") , // 타입
-          start_date :  searchApproval.approval_data.get("ApprovalStartDate") ,  // 휴가 시작 일
-          end_date :  searchApproval.approval_data.get("ApprovalEndDate") ,  // 휴가 종료 일
-          request_description : searchApproval.approval_data.get("ApprovalRequestDescription") ,  // 휴가 사유
-          employee_phone : searchApproval.approval_data.get("ApprovalEmployeePhone") ,  // 휴가자 연락처
-          request_date : searchApproval.approval_data.get("RequestDate") ,  // 휴가 요청 날짜
-          approval_yn : searchApproval.approval_data.get("ApprovalYn") ,  // 휴가 승인 여부
-          employee_code : searchApproval.approval_data.get("ApprovalEmployeeId") ,  // 휴가 직원 아이디
-          approval_date : searchApproval.approval_data.get("ApprovalDate"),  // 휴가 승인 날짜
-          return_description : req.body.approval_description , // 반려 사유 ( 승인 일 경우에는 승인 사유가 없는데 그냥 심사 사유로 변경하는게 어떨지 확인하기)
-          insert_date : searchApproval.approval_data.get("InsertDate") ,  // 휴가 요청 날짜
-          update_date : new Date()  // 결재심사 일자
-      });
+        var newVacation = new Vacation({
+            code  : newCode,
+            type  : searchApproval.approval_data["ApprovalVacationType"] , // 타입
+            start_date :  searchApproval.approval_data["ApprovalStartDate"] ,  // 휴가 시작 일
+            end_date :  searchApproval.approval_data["ApprovalEndDate"] ,  // 휴가 종료 일
+            request_description : searchApproval.approval_data["ApprovalRequestDescription"] ,  // 휴가 사유
+            employee_phone : searchApproval.approval_data["ApprovalEmployeePhone"] ,  // 휴가자 연락처
+            request_date : searchApproval.approval_data["RequestDate"] ,  // 휴가 요청 날짜
+            approval_yn : searchApproval.approval_data["ApprovalYn"] ,  // 휴가 승인 여부
+            employee_code : searchApproval.approval_data["ApprovalEmployeeId"] ,  // 휴가 직원 아이디
+            approval_date : searchApproval.approval_data["ApprovalDate"],  // 휴가 승인 날짜
+            return_description : req.body.approval_description , // 반려 사유 ( 승인 일 경우에는 승인 사유가 없는데 그냥 심사 사유로 변경하는게 어떨지 확인하기)
+            insert_date : searchApproval.approval_data["InsertDate"] ,  // 휴가 요청 날짜
+            update_date : new Date()  // 결재심사 일자
+        });
 
-      //결재 update , 휴가는 insert 어느것을 리턴할지는 협의해서 정하도록
-      //임시로 결재 찾아서 리턴
-      newVacation.save(function(error,vacation){
-        if(error){
-          return next(error);
-        }
-        approval.findOne({
-          code:approval.code
-        }).exec(function(error,results){
-          if(error){}
+        //결재 update , 휴가는 insert 어느것을 리턴할지는 협의해서 정하도록
+        //임시로 결재 찾아서 리턴
+        newVacation.save(function(error,vacation){
+          if(error){
             return next(error);
-          res.json(results);
+          }
+          console.dir("searchVacation Code::"+vacation.code);
+          Vacation.findOne({
+            code:vacation.code
+          }).exec(function(error,results){
+            if(error)
+              return next(error);
+            res.json(results);
+          });
         });
       });
+
     });
 
   });
