@@ -48,7 +48,8 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
     if(error){
       return next(error);
     }
-    res.json(results);
+    res.json(new Approval(results).toObject());
+    //res.json(results.toObject());
   });
 
 });
@@ -138,7 +139,6 @@ router.put("/mis/1.0/approvals/:approvalCode",function(req,res,next){
     searchApproval.request_description = req.body.request_description || searchApproval.request_description;   //요청 사유
     searchApproval.approval_employee_id = req.body.approval_employee_id || searchApproval.approval_employee_id;   //승인자목록
 
-    console.dir("abab::"+searchApproval.approval_data["ApprovalEmployeePhone"]);
     searchApproval.save(function(error,approval){
       if(error){
         return next(error);
@@ -154,11 +154,17 @@ router.put("/mis/1.0/approvals/:approvalCode",function(req,res,next){
 //휴가결재 심사
 router.put("/mis/1.0/vacations/approvals/:approvalCode/evaluate",function(req,res,next){
   var newCode=0;
+  var state = req.body.approval_state;
   Approval.findOne({
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
+    if(state==2){
+      searchApproval.approval_data["ApprovalYn"]="Y";
+    }else{
+      searchApproval.approval_data["ApprovalYn"]="N";
+    }
 
-    searchApproval.state = req.body.approval_state;
+    searchApproval.state = state;
     searchApproval.approval_description = req.body.approval_description;
     searchApproval.save(function(error,approval){ //결재 테이블 update
       if(error){
@@ -210,4 +216,10 @@ router.put("/mis/1.0/vacations/approvals/:approvalCode/evaluate",function(req,re
   });
 });
 
+//휴가결재 삭제
+/*
+router.delete("/mis/1.0/vacations/approvals/:approvalCode"){
+  Approval.remove({code:req.params.approvalCode})
+}
+*/
 module.exports = router;

@@ -66,4 +66,31 @@ var ApprovalSchema = new Schema({
   }
 });
 
+/*형변환 테스트*/
+if(!ApprovalSchema.options.toObject) ApprovalSchema.options.toObject = {};
+ApprovalSchema.options.hide = '_id';
+ApprovalSchema.options.toObject.transform = function (doc, ret, options) {
+  // remove the _id of every document before returning the result
+  ret.insert_date = setDateYYYYMMDD(ret.insert_date);
+  return ret;
+}
+
+//날짜변환 함수
+function setDateYYYYMMDD(date){
+  var yyyy = date.getFullYear().toString();
+  var mm = "";
+  if(date.getMonth()<10){
+    mm = "0"+date.getMonth();
+  }else{
+    mm = date.getDate().toString();
+  }
+  var dd = "";
+  if(date.getDate()<10){
+    dd = "0"+date.getDate();
+  }else{
+    dd = date.getDate();
+  }
+  return yyyy+'-'+mm+'-'+dd;
+}
+
 module.exports = mongoose.model('Approval',ApprovalSchema);
