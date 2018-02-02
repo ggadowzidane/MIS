@@ -67,6 +67,7 @@ var ApprovalSchema = new Schema({
 });
 
 /*형변환 테스트*/
+/*
 if(!ApprovalSchema.options.toObject) ApprovalSchema.options.toObject = {};
 ApprovalSchema.options.hide = '_id';
 ApprovalSchema.options.toObject.transform = function (doc, ret, options) {
@@ -74,7 +75,7 @@ ApprovalSchema.options.toObject.transform = function (doc, ret, options) {
   ret.insert_date = setDateYYYYMMDD(ret.insert_date);
   return ret;
 }
-
+*/
 //날짜변환 함수
 function setDateYYYYMMDD(date){
   var yyyy = date.getFullYear().toString();

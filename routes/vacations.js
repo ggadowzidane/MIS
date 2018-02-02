@@ -48,8 +48,9 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
     if(error){
       return next(error);
     }
-    res.json(new Approval(results).toObject());
+    //res.json(new Approval(results).toObject());
     //res.json(results.toObject());
+    res.json(results);
   });
 
 });
@@ -217,9 +218,11 @@ router.put("/mis/1.0/vacations/approvals/:approvalCode/evaluate",function(req,re
 });
 
 //휴가결재 삭제
-/*
-router.delete("/mis/1.0/vacations/approvals/:approvalCode"){
-  Approval.remove({code:req.params.approvalCode})
-}
-*/
+router.delete("/mis/1.0/vacations/approvals/:approvalCode",function(req,res,next){
+  Approval.remove({code:req.params.approvalCode},function(error){
+    if(error) return next(error);
+    res.json('delete success');
+  });
+});
+
 module.exports = router;
