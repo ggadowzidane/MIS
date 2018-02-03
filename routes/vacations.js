@@ -48,6 +48,7 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
     if(error){
       return next(error);
     }
+    new Approval(results).toJSON();
     //res.json(new Approval(results).toObject());
     //res.json(results.toObject());
     res.json(results);
@@ -98,7 +99,7 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
                       ApprovalRequestDescription:req.body.ApprovalRequestDescription,
                       ApprovalEmployeePhone:req.body.ApprovalEmployeePhone,
                       RequestDate:new Date(), //request_Datejjadf
-                      ApprovalYn:'Y', //approval_yn
+                      ApprovalYn:'N', //approval_yn
                       ApprovalEmployeeId:req.body.ApprovalEmployeeId, //employee_id
                       ApprovalDate:new Date(), // approval_date
                       InsertDate:new Date() //insert_date
