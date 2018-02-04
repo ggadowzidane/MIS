@@ -48,9 +48,15 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
     if(error){
       return next(error);
     }
+    /*
+    console.dir(results.map(function(results){
+      return results.toJSON();
+    }));
+    */
     new Approval(results).toJSON();
     //res.json(new Approval(results).toObject());
     //res.json(results.toObject());
+    //res.json(results);
     res.json(results);
   });
 

@@ -71,8 +71,31 @@ ApprovalSchema.set('toJSON', { getters: true, virtuals: false });
 
 ApprovalSchema.options.toJSON = {
   transform : function (doc, ret, options) {
+    //transform은 응답객체의 한객체 마다 호출한다.
     // remove the _id of every document before returning the result
-    // ret.insert_date = setDateYYYYMMDD(ret.insert_date);
+
+    ret["hold_date"] = setDateYYYYMMDD(ret["hold_date"]);
+    ret["request_date"] = setDateYYYYMMDD(ret["request_date"]);
+    ret["approval_date"] = setDateYYYYMMDD(ret["approval_date"]);
+    ret["update_date"] = setDateYYYYMMDD(ret["update_date"]);
+    ret["insert_date"] = setDateYYYYMMDD(ret["insert_date"]);
+    var approval_data = ret["approval_data"];
+    if(approval_data != null){
+      approval_data["ApprovalDate"] = setDateYYYYMMDD(approval_data["ApprovalDate"]);
+      approval_data["RequestDate"] = setDateYYYYMMDD(approval_data["RequestDate"]);
+      approval_data["InsertDate"] = setDateYYYYMMDD(approval_data["InsertDate"]);
+      console.dir("approval_data start");
+      console.dir(approval_data);
+      console.dir("approval_data end");
+      ret["approval_data"] = approval_data;
+    }
+    /*
+    ret["approval_data"]["ApprovalStartDate"] = setDateYYYYMMDD(ret["approval_data"]["ApprovalStartDate"]);
+    ret["approval_data"]["ApprovalEndDate"] = setDateYYYYMMDD(ret["approval_data"]["ApprovalEndDate"]);
+    ret["approval_data"]["RequestDate"] = setDateYYYYMMDD(ret["approval_data"]["RequestDate"]);
+    ret["approval_data"]["InsertDate"] = setDateYYYYMMDD(ret["approval_data"]["InsertDate"]);
+    */
+    //ret.insert_date = setDateYYYYMMDD(ret.insert_date);
     return ret;
   }
 }
