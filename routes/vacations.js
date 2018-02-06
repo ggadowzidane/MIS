@@ -44,7 +44,7 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
     approvalQuery.where('request_date').gt(new Date(approvalStartDate)).lt(new Date(approvalEndDate));
   }
 
-  approvalQuery.sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
+  approvalQuery.sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,searchApproval){
     if(error){
       return next(error);
     }
@@ -53,11 +53,12 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
       return results.toJSON();
     }));
     */
-    new Approval(results).toJSON();
+
     //res.json(new Approval(results).toObject());
     //res.json(results.toObject());
     //res.json(results);
-    res.json(results);
+
+    res.end(Approval.toJSON(searchApproval));
   });
 
 });

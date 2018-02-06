@@ -67,8 +67,6 @@ var ApprovalSchema = new Schema({
 });
 
 /*형변환 테스트*/
-ApprovalSchema.set('toJSON', { getters: true, virtuals: false });
-
 ApprovalSchema.options.toJSON = {
   transform : function (doc, ret, options) {
     //transform은 응답객체의 한객체 마다 호출한다.
@@ -84,18 +82,8 @@ ApprovalSchema.options.toJSON = {
       approval_data["ApprovalDate"] = setDateYYYYMMDD(approval_data["ApprovalDate"]);
       approval_data["RequestDate"] = setDateYYYYMMDD(approval_data["RequestDate"]);
       approval_data["InsertDate"] = setDateYYYYMMDD(approval_data["InsertDate"]);
-      console.dir("approval_data start");
-      console.dir(approval_data);
-      console.dir("approval_data end");
       ret["approval_data"] = approval_data;
     }
-    /*
-    ret["approval_data"]["ApprovalStartDate"] = setDateYYYYMMDD(ret["approval_data"]["ApprovalStartDate"]);
-    ret["approval_data"]["ApprovalEndDate"] = setDateYYYYMMDD(ret["approval_data"]["ApprovalEndDate"]);
-    ret["approval_data"]["RequestDate"] = setDateYYYYMMDD(ret["approval_data"]["RequestDate"]);
-    ret["approval_data"]["InsertDate"] = setDateYYYYMMDD(ret["approval_data"]["InsertDate"]);
-    */
-    //ret.insert_date = setDateYYYYMMDD(ret.insert_date);
     return ret;
   }
 }
