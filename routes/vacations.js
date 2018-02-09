@@ -1,5 +1,6 @@
 var express = require('express');
 var mongoose = require('mongoose');
+var async = require('async');
 var Vacation = mongoose.model('Vacation');
 var Approval = mongoose.model('Approval');
 
@@ -24,6 +25,54 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
   //휴가결재 목록조회에서는 결재에 대한 정보만 나타낸다. (TABLE : APPROVAL)
   //완료된 휴가 리스트들은 휴가 목록조회에서 보여준다. (TABLE : VACATION)
 
+  async.series([
+    function(callback){
+      Approval.count({
+        $or:[
+              {"request_employee_id":req.query.employeeId},
+              {"reference_employee_id":req.query.employeeId},
+              {"approval_employee_id":req.query.employeeId}
+            ]  // 결재요청직원 , 결재참조직원 , 결재승인직원아이디 전부 포함된 조건
+      },function(err, TotalCount){
+        callback(null, TotalCount);
+      });
+    },
+    function(callback){
+      var approvalQuery = Approval.find({
+        $or:[
+              {"request_employee_id":req.query.employeeId},
+              {"reference_employee_id":req.query.employeeId},
+              {"approval_employee_id":req.query.employeeId}
+            ]  // 결재요청직원 , 결재참조직원 , 결재승인직원아이디 전부 포함된 조건
+      });
+
+      approvalQuery.where('type').equals(1);
+
+      if(approvalState != ""){
+        console.dir('state check in vacation search');
+        approvalQuery.where('state').equals(approvalState);
+      }
+
+      if(approvalStartDate!="" && approvalEndDate!=""){
+        console.dir('date check in vacation search');
+        approvalQuery.where('request_date').gt(new Date(approvalStartDate)).lt(new Date(approvalEndDate));
+      }
+
+      approvalQuery.sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
+        if(error){
+          return next(error);
+        }
+        callback(null , results.map(Approval => Approval.toJSON()));
+      });
+    }
+  ] , function(err,results){
+    res.json({
+      totalCnt : results[0],
+      approval : results[1]
+    })
+  });
+
+  /*
   Approval.count({},function(err, TotalCount){
     totalCnt = TotalCount;
     var approvalQuery = Approval.find({
@@ -57,6 +106,7 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
         });
     });
   });
+  */
 });
 
 //휴가결재 상세조회
