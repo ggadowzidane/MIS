@@ -44,21 +44,12 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
     approvalQuery.where('request_date').gt(new Date(approvalStartDate)).lt(new Date(approvalEndDate));
   }
 
-  approvalQuery.sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,searchApproval){
+  approvalQuery.sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
     if(error){
       return next(error);
     }
-    /*
-    console.dir(results.map(function(results){
-      return results.toJSON();
-    }));
-    */
-
-    //res.json(new Approval(results).toObject());
-    //res.json(results.toObject());
     //res.json(results);
-
-    res.end(Approval.toJSON(searchApproval));
+    res.json(results.map(Approval => Approval.toJSON()));
   });
 
 });
