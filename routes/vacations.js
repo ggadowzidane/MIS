@@ -52,7 +52,7 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
       }
       //res.json(results);
       res.json({
-          Approval : results.map(Approval => Approval.toJSON()),
+          approval : results.map(Approval => Approval.toJSON()),
           totalCount : totalCnt
         });
     });
