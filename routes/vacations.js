@@ -16,7 +16,7 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
   //이것도 페이징 처리 하는것인지 확인하여 queryString restfulAPI에도 추가하는지 확인
   var pageCount = parseInt(req.query.pageCount);  // 한페이지에 출력 갯수
   var pagingNumber = parseInt(req.query.pagingNumber);  // 페이지 번호
-
+  var totalCnt = ""; //
   if(pageCount==undefined) { pageCount = 10; } //값이 넘어오지 않을 경우 기본값 셋팅
   if(pagingNumber==undefined) { pagingNumber = 1; }//값이 넘어오지 않을 경우 기본값 셋팅
   //console.dir("employeeId :: " + employeeId + "/approvalState::"+approvalState);
@@ -24,34 +24,39 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
   //휴가결재 목록조회에서는 결재에 대한 정보만 나타낸다. (TABLE : APPROVAL)
   //완료된 휴가 리스트들은 휴가 목록조회에서 보여준다. (TABLE : VACATION)
 
-  var approvalQuery = Approval.find({
-    $or:[
-          {"request_employee_id":req.query.employeeId},
-          {"reference_employee_id":req.query.employeeId},
-          {"approval_employee_id":req.query.employeeId}
-        ]  // 결재요청직원 , 결재참조직원 , 결재승인직원아이디 전부 포함된 조건
-  });
+  Approval.count({},function(err, TotalCount){
+    totalCnt = TotalCount;
+    var approvalQuery = Approval.find({
+      $or:[
+            {"request_employee_id":req.query.employeeId},
+            {"reference_employee_id":req.query.employeeId},
+            {"approval_employee_id":req.query.employeeId}
+          ]  // 결재요청직원 , 결재참조직원 , 결재승인직원아이디 전부 포함된 조건
+    });
 
-  approvalQuery.where('type').equals(1);
+    approvalQuery.where('type').equals(1);
 
-  if(approvalState != ""){
-    console.dir('state check in vacation search');
-    approvalQuery.where('state').equals(approvalState);
-  }
-
-  if(approvalStartDate!="" && approvalEndDate!=""){
-    console.dir('date check in vacation search');
-    approvalQuery.where('request_date').gt(new Date(approvalStartDate)).lt(new Date(approvalEndDate));
-  }
-
-  approvalQuery.sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
-    if(error){
-      return next(error);
+    if(approvalState != ""){
+      console.dir('state check in vacation search');
+      approvalQuery.where('state').equals(approvalState);
     }
-    //res.json(results);
-    res.json(results.map(Approval => Approval.toJSON()));
-  });
 
+    if(approvalStartDate!="" && approvalEndDate!=""){
+      console.dir('date check in vacation search');
+      approvalQuery.where('request_date').gt(new Date(approvalStartDate)).lt(new Date(approvalEndDate));
+    }
+
+    approvalQuery.sort('code').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
+      if(error){
+        return next(error);
+      }
+      //res.json(results);
+      res.json({
+          Approval : results.map(Approval => Approval.toJSON()),
+          totalCount : totalCnt
+        });
+    });
+  });
 });
 
 //휴가결재 상세조회

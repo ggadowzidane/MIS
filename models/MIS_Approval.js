@@ -71,7 +71,6 @@ ApprovalSchema.options.toJSON = {
   transform : function (doc, ret, options) {
     //transform은 응답객체의 한객체 마다 호출한다.
     // remove the _id of every document before returning the result
-    console.dir(doc);
     ret["hold_date"] = setDateYYYYMMDD(ret["hold_date"]);
     ret["request_date"] = setDateYYYYMMDD(ret["request_date"]);
     ret["approval_date"] = setDateYYYYMMDD(ret["approval_date"]);
