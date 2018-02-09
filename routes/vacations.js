@@ -67,7 +67,7 @@ router.get('/mis/1.0/vacations/approvals',function(req,res,next){
     }
   ] , function(err,results){
     res.json({
-      totalCnt : results[0],
+      totalCount : results[0],
       approval : results[1]
     })
   });
