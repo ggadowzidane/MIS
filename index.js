@@ -13,6 +13,7 @@ var employees = require('./routes/employees');
 var departments = require('./routes/departments');
 var approvals = require('./routes/approvals');
 var vacations = require('./routes/vacations');
+var resources = require('./routes/resources');
 var login = require('./routes/login');
 
 var app = express();
@@ -30,7 +31,7 @@ app.use(departments);
 app.use(employees);
 app.use(approvals);
 app.use(vacations);
-
+app.use(resources);
 
 // 404를 잡아 오류 처리기로 전달
 app.use(function(req, res, next) {
