@@ -128,7 +128,7 @@ router.post("/mis/1.0/vacations/approvals",function(req,res,next){
 
   //신규 결재 코드 준비값
   Approval.find().sort({'code':-1}).limit(1).exec(function(error,results){
-    if(results==null){
+    if(results==""){
       newCode = 0;
     }else{
       newCode = (results[0].code)+1;
@@ -200,7 +200,7 @@ router.put("/mis/1.0/approvals/:approvalCode",function(req,res,next){
         return next(error);
       }
       var updateYnVal = true; //휴가결재 수정 체크 여부
-      if(approval==null){updateYnVal=false;}
+      if(approval==""){updateYnVal=false;}
       //휴가결재수정 성공여부 리턴
       res.json({updateYn:updateYnVal});
     });
@@ -230,7 +230,7 @@ router.put("/mis/1.0/vacations/approvals/:approvalCode/evaluate",function(req,re
       if(state == 2){
         //결재 테이블 update 후 휴가 결재 테이블에 insert
         Vacation.find().sort({'code': 1}).limit(1).exec(function(error,results){ //신규 결재 코드 준비값
-          if(results==null){
+          if(results==""){
             newCode = 0;
           }else{
             newCode = (results[0].code)+1;

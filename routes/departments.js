@@ -42,7 +42,7 @@ router.post('/mis/1.0/departments',function(req,res,next){
 
   //신규 부서 코드 준비값
   Department.find().sort({'code':-1}).limit(1).exec(function(error,results){
-    if(results==null){
+    if(results==""){
       newCode = 0;
     }else{
       newCode = results[0].code;

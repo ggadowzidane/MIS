@@ -18,7 +18,7 @@ router.get("/mis/1.0/employees",function(req,res,next){
   //queryString 중 employeeName이 없으면 관리자의 전체조회를 의미
   var array = {};
 
-  if(employeeName==null){    }
+  if(employeeName==""){    }
   else {
     employeearray["name"] = employeeName;
   }
@@ -168,7 +168,7 @@ router.put("/mis/1.0/employees/:employeeId",function(req,res,next){
         return next(error);
       }
       var updateYnVal = true;   //이메일 중복 체크 여부
-      if(employee == null) {  updateYnVal = false;   }
+      if(employee == "") {  updateYnVal = false;   }
       //회원정보수정 성공여부 리턴
       res.json({updateYn:updateYnVal});
     });
@@ -192,7 +192,7 @@ router.get("/mis/1.0/employees/emailCheck/:emailAddress",function(req,res,next){
       return next(error);
     }
     var checkYnVal = true;   //이메일 중복 체크 여부
-    if(results == null) {  checkYnVal = false;   }
+    if(results == "") {  checkYnVal = false;   }
     //이메일 중복체크 하여 중복확인 결과 리턴
     res.json({checkYn:checkYnVal});
   });

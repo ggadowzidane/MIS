@@ -21,11 +21,12 @@ router.get('/mis/1.0/resources/approvals',function(req,res,next){
   //동기 처리를 위하여 async 사용
   async.series([
     function(callback){
+      //총 갯수를 구하는 조건은 협의가 필요할듯. 20180413
       Approval.count({
         $or:[
-              {"request_employee_id":req.query.employeeId},
-              {"reference_employee_id":req.query.employeeId},
-              {"approval_employee_id":req.query.employeeId}
+              {"request_employee_id":employeeId},
+              {"reference_employee_id":employeeId},
+              {"approval_employee_id":employeeId}
             ]  // 결재요청직원 , 결재참조직원 , 결재승인직원아이디 전부 포함된 조건
       },function(err, TotalCount){
         callback(null, TotalCount);
@@ -34,9 +35,9 @@ router.get('/mis/1.0/resources/approvals',function(req,res,next){
     function(callback){
       var approvalQuery = Approval.find({
         $or:[
-              {"request_employee_id":req.query.employeeId},
-              {"reference_employee_id":req.query.employeeId},
-              {"approval_employee_id":req.query.employeeId}
+              {"request_employee_id":employeeId},
+              {"reference_employee_id":employeeId},
+              {"approval_employee_id":employeeId}
             ]  // 결재요청직원 , 결재참조직원 , 결재승인직원아이디 전부 포함된 조건
       });
 
@@ -52,8 +53,8 @@ router.get('/mis/1.0/resources/approvals',function(req,res,next){
         if(error){
           return next(error);
         }
-        //callback(null , results.map(Approval => Approval.toJSON()));
-        callback(null,results);
+        callback(null , results.map(Approval => Approval.toJSON()));
+        //callback(null,results);
       });
     }
   ] , function(err,results){
@@ -83,7 +84,7 @@ router.post("/mis/1.0/resources/approvals",function(req,res,next){
   async.waterfall([
     function(callback){
       Approval.find().sort({'code':-1}).limit(1).exec(function(error,results){
-        if(results==null){
+        if(results==""){
           newCode = 0;
         }
         else{
@@ -148,16 +149,19 @@ router.delete("/mis/1.0/resources/approvals/:approvalCode",function(req,res,next
   async.waterfall([
     function(callback){
       Approval.findOne({code:approvalCode}).exec(function(error,results){
-        if(results==null){
+        console.dir('aaaa');
+        if(results==""){
           approvalState = null;
         }else{
           console.log("state in approval resource delete method :: " +  results["state"]);
           approvalState = results["state"];
         }
+        console.dir('bbbb');
         callback(null,approvalState);
       });
     },
     function(state , callback){
+      console.dir('state::'+state);
       if(state == null){
         message = "no approval";
       }
@@ -166,14 +170,16 @@ router.delete("/mis/1.0/resources/approvals/:approvalCode",function(req,res,next
           Approval.remove({code:req.params.approvalCode},function(error){
             if(error) return next(error);
             message = 'delete success';
+            callback(null,message);
           });
         }else{
           message = 'delete is failed (approval is end)';
+          callback(null,message);
         }
       }
     }
   ],function(err , results){
-    res.json(message);
+    res.json(results);
   });
 });
 
@@ -211,7 +217,7 @@ router.put("/mis/1.0/resources/approvals/:approvalCode",function(req,res,next){
 //자재결재 심사
 router.put("/mis/1.0/resources/approvals/:approvalCode/evaluate",function(req,res,next){
   var newCode=0;
-  var state = req.body.approval_state;
+  var state = req.body.approvalState;
   Approval.findOne({
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
@@ -222,7 +228,7 @@ router.put("/mis/1.0/resources/approvals/:approvalCode/evaluate",function(req,re
     }
 
     searchApproval.state = state;
-    searchApproval.approval_description = req.body.approval_description;
+    searchApproval.approval_description = req.body.approvalDescription;
     searchApproval.save(function(error,approval){ //결재 테이블 update
       if(error){
         return next(error);
@@ -231,7 +237,8 @@ router.put("/mis/1.0/resources/approvals/:approvalCode/evaluate",function(req,re
       if(state == 2){
         //결재 테이블 update 후 휴가 결재 테이블에 insert
         Resource.find().sort({'code': 1}).limit(1).exec(function(error,results){ //신규 결재 코드 준비값
-          if(results==null){
+          console.dir((results==""));
+          if(results==""){
             newCode = 0;
           }else{
             newCode = (results[0].code)+1;
@@ -256,7 +263,7 @@ router.put("/mis/1.0/resources/approvals/:approvalCode/evaluate",function(req,re
               return next(error);
             }
             console.dir("searchResource Code::"+resource.code);
-            Reourse.findOne({
+            Resource.findOne({
               code:resource.code
             }).exec(function(error,results){
               if(error)
@@ -290,7 +297,7 @@ router.get("/mis/1.0/resources",function(req,res,next){
        });
     },
     function(callback){
-      Resource.find().sort('code',1).skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
+      Resource.find().sort({'code':1}).skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
         if(error){
           return next(error);
         }
@@ -299,7 +306,7 @@ router.get("/mis/1.0/resources",function(req,res,next){
     }
   ] , function(err,results){
       res.json({
-        totalCount : result[0],
+        totalCount : results[0],
         resource : results[1]
       });
     }
@@ -308,10 +315,10 @@ router.get("/mis/1.0/resources",function(req,res,next){
 
 //자재 상세 조회
 router.get("/mis/1.0/resources/:resourceCode",function(req,res,next){
-  Resouece.findOne({
+  Resource.findOne({
     code:req.params.resourceCode
   }).exec(function(err,results){
-    if(error){
+    if(err){
       return next(error);
     }
     res.json(results);

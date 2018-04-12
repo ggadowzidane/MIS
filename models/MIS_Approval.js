@@ -87,19 +87,21 @@ ApprovalSchema.options.toJSON = {
   }
 }
 //날짜변환 함수
-function setDateYYYYMMDD(date){
-  var yyyy = date.getFullYear().toString();
+function setDateYYYYMMDD(inputDate){
+  var nDate = new Date(inputDate);
+
+  var yyyy = nDate.getFullYear().toString();
   var mm = "";
-  if(date.getMonth()<10){
-    mm = "0"+date.getMonth();
+  if(nDate.getMonth()<10){
+    mm = "0"+nDate.getMonth();
   }else{
-    mm = date.getDate().toString();
+    mm = nDate.getDate().toString();
   }
   var dd = "";
-  if(date.getDate()<10){
-    dd = "0"+date.getDate();
+  if(nDate.getDate()<10){
+    dd = "0"+nDate.getDate();
   }else{
-    dd = date.getDate();
+    dd = nDate.getDate();
   }
   return yyyy+'-'+mm+'-'+dd;
 }
