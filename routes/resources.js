@@ -236,13 +236,13 @@ router.put("/mis/1.0/resources/approvals/:approvalCode/evaluate",function(req,re
       if(state == 2){
         //결재 테이블 update 후 휴가 결재 테이블에 insert
         Resource.find().sort({'code': 1}).limit(1).exec(function(error,results){ //신규 결재 코드 준비값
-          console.dir((results==""));
+
           if(results==""){
             newCode = 0;
           }else{
             newCode = (results[0].code)+1;
           }
-
+          console.dir('new Code ::'+newCode);
           var newResource = new Resource({
               code  : newCode,
               name  :  searchApproval.approval_data["approvalResourceName"] ,                   // 자재명

@@ -12,8 +12,8 @@ var ResourceSchema = new Schema({
     required:true
   },
   employee_id:{
-    type:Schema.Types.ObjectId,
-    ref:'Employee'
+    type:String,
+    required:true
   },
   count:{
     type:Number,
