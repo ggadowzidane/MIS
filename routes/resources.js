@@ -246,7 +246,7 @@ router.put("/mis/1.0/resources/approvals/:approvalCode/evaluate",function(req,re
           var newResource = new Resource({
               code  : newCode,
               name  :  searchApproval.approval_data["approvalResourceName"] ,                   // 자재명
-              employee_id : searchApproval.approval_data["approvalEmployeeId"] ,                // 자재 등록 아이디
+              employee_id : searchApproval.approval_data["approvalManagerId"] ,                 // 자재 담당자 아이디
               count :  searchApproval.approval_data["approvalResourceCount"] ,                  // 자재 갯수
               type  :  searchApproval.approval_data["approvalResourceType"] ,                   // 자재 타입
               insert_employee_id : searchApproval.approval_data["approvalInsertEmployeeId"] ,   // 자재 등록 아이디
