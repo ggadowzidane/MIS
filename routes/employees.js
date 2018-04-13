@@ -18,9 +18,9 @@ router.get("/mis/1.0/employees",function(req,res,next){
   //queryString 중 employeeName이 없으면 관리자의 전체조회를 의미
   var array = {};
 
-  if(employeeName==""){    }
+  if(employeeName==null){    }
   else {
-    employeearray["name"] = employeeName;
+    array["name"] = employeeName;
   }
 
   Employee.find(array).sort('id').skip((pagingNumber-1)*pageCount).limit(pageCount).exec(function(error,results){
