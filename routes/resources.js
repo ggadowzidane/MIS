@@ -235,7 +235,7 @@ router.put("/mis/1.0/resources/approvals/:approvalCode/evaluate",function(req,re
       // 승인일 경우 휴가 테이블에 등록 반려 및 기안일 경우 null값 반환
       if(state == 2){
         //결재 테이블 update 후 휴가 결재 테이블에 insert
-        Resource.find().sort({'code': 1}).limit(1).exec(function(error,results){ //신규 결재 코드 준비값
+        Resource.find().sort({'code': -1}).limit(1).exec(function(error,results){ //신규 결재 코드 준비값
 
           if(results==""){
             newCode = 0;
