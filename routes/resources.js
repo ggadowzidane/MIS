@@ -103,16 +103,15 @@ router.post("/mis/1.0/resources/approvals",function(req,res,next){
         reference_employee_id:req.body.approvalReferenceEmployeeId,
         approval_employee_id:req.body.approvalEmployeeId,
         request_description:req.body.approvalRequestDescription,
-        approval_date:new Date(req.body.approvalDate),
         insert_date:new Date(),
         approval_data:{
-          ApprovalResourceName:req.body.approvalResourceName,     // 자재명
-          ApprovalResourceCount:req.body.approvalResourceCount,   // 자재 갯수
-          ApprovalResourceType:req.body.approvalResourceType,     // 자재 타입
-          ApprovalEmployeeId:req.body.approvalEmployeeId,         // 자재 담당자 아이디
-          ApprovalYn:'N',                                         // 결재 여부
-          ApprovalInsertEmployeeId:req.body.approvalInsertEmployeeId, // 자재 등록 아이디
-          InsertDate:new Date()                                   // insert_date
+          approvalResourceName:req.body.approvalResourceName,     // 자재명
+          approvalResourceCount:req.body.approvalResourceCount,   // 자재 갯수
+          approvalResourceType:req.body.approvalResourceType,     // 자재 타입
+          approvalEmployeeId:req.body.approvalEmployeeId,         // 자재 담당자 아이디
+          approvalYn:'N',                                         // 결재 여부
+          approvalInsertEmployeeId:req.body.approvalInsertEmployeeId, // 자재 등록 아이디
+          iunsertDate:new Date()                                   // insert_date
         }
       });
 
@@ -189,10 +188,10 @@ router.put("/mis/1.0/resources/approvals/:approvalCode",function(req,res,next){
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
     if(searchApproval.state==1){  // 결재 상태가 기안인 경우 update 진행
-      searchApproval.approval_data["ApprovalResourceCount"] = req.body.resourceCount || searchApproval.approval_data["ApprovalResourceCount"];  //자재명
-      searchApproval.approval_data["ApprovalResourceName"] = req.body.resourceName || searchApproval.approval_data["ApprovalResourceName"];     //휴가 시작일자
-      searchApproval.approval_data["ApprovalResourceType"] = req.body.resourceType || searchApproval.approval_data["ApprovalResourceType"];     //자재 타입
-      searchApproval.approval_data["ApprovalEmployeeId"] = req.body.resourceType || searchApproval.approval_data["ApprovalEmployeeId"];         //자재 등록 아이디
+      searchApproval.approval_data["approvalResourceCount"] = req.body.resourceCount || searchApproval.approval_data["ApprovalResourceCount"];  //자재명
+      searchApproval.approval_data["approvalResourceName"] = req.body.resourceName || searchApproval.approval_data["ApprovalResourceName"];     //휴가 시작일자
+      searchApproval.approval_data["approvalResourceType"] = req.body.resourceType || searchApproval.approval_data["ApprovalResourceType"];     //자재 타입
+      searchApproval.approval_data["approvalEmployeeId"] = req.body.resourceType || searchApproval.approval_data["ApprovalEmployeeId"];         //자재 등록 아이디
       searchApproval.markModified('approval_data');     //Schema가 mixed 타입일 경우 해당 함수 호출해야 mixed 타입 수정이 된다.
 
       searchApproval.reference_employee_id = req.body.referenceEmployeeId || searchApproval.reference_employee_id;   //참조자목록
@@ -222,9 +221,9 @@ router.put("/mis/1.0/resources/approvals/:approvalCode/evaluate",function(req,re
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
     if(state==2){
-      searchApproval.approval_data["ApprovalYn"]="Y";
+      searchApproval.approval_data["approvalYn"]="Y";
     }else{
-      searchApproval.approval_data["ApprovalYn"]="N";
+      searchApproval.approval_data["approvalYn"]="N";
     }
 
     searchApproval.state = state;
@@ -246,12 +245,12 @@ router.put("/mis/1.0/resources/approvals/:approvalCode/evaluate",function(req,re
 
           var newResource = new Resource({
               code  : newCode,
-              name  :  searchApproval.approval_data["ApprovalResourceName"] ,                   // 자재명
-              employee_id : searchApproval.approval_data["ApprovalEmployeeId"] ,                // 자재 등록 아이디
-              count :  searchApproval.approval_data["ApprovalResourceCount"] ,                  // 자재 갯수
-              type  :  searchApproval.approval_data["ApprovalResourceType"] ,                   // 자재 타입
-              insert_employee_id : searchApproval.approval_data["ApprovalInsertEmployeeId"] ,   // 자재 등록 아이디
-              insert_date : searchApproval.approval_data["InsertDate"] ,  // 휴가 요청 날짜
+              name  :  searchApproval.approval_data["approvalResourceName"] ,                   // 자재명
+              employee_id : searchApproval.approval_data["approvalEmployeeId"] ,                // 자재 등록 아이디
+              count :  searchApproval.approval_data["approvalResourceCount"] ,                  // 자재 갯수
+              type  :  searchApproval.approval_data["approvalResourceType"] ,                   // 자재 타입
+              insert_employee_id : searchApproval.approval_data["approvalInsertEmployeeId"] ,   // 자재 등록 아이디
+              insert_date : searchApproval.approval_data["insertDate"] ,  // 휴가 요청 날짜
               update_date : new Date(),  // 결재심사 일자
               delete_yn   : 'N'         // 자재 삭제 유무
           });
