@@ -220,7 +220,7 @@ router.put("/mis/1.0/resources/approvals/:approvalCode/evaluate",function(req,re
   Approval.findOne({
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
-    if(state==2){
+    if(state==2 || state==3){
       searchApproval.approval_data["approvalYn"]="Y";
     }else{
       searchApproval.approval_data["approvalYn"]="N";
