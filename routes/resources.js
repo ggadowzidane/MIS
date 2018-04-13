@@ -188,10 +188,10 @@ router.put("/mis/1.0/resources/approvals/:approvalCode",function(req,res,next){
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
     if(searchApproval.state==1){  // 결재 상태가 기안인 경우 update 진행
-      searchApproval.approval_data["approvalResourceCount"] = req.body.resourceCount || searchApproval.approval_data["ApprovalResourceCount"];  //자재명
-      searchApproval.approval_data["approvalResourceName"] = req.body.resourceName || searchApproval.approval_data["ApprovalResourceName"];     //휴가 시작일자
-      searchApproval.approval_data["approvalResourceType"] = req.body.resourceType || searchApproval.approval_data["ApprovalResourceType"];     //자재 타입
-      searchApproval.approval_data["approvalEmployeeId"] = req.body.resourceType || searchApproval.approval_data["ApprovalEmployeeId"];         //자재 등록 아이디
+      searchApproval.approval_data["approvalResourceCount"] = req.body.resourceCount || searchApproval.approval_data["approvalResourceCount"];  //자재명
+      searchApproval.approval_data["approvalResourceName"] = req.body.resourceName || searchApproval.approval_data["approvalResourceName"];     //휴가 시작일자
+      searchApproval.approval_data["approvalResourceType"] = req.body.resourceType || searchApproval.approval_data["approvalResourceType"];     //자재 타입
+      searchApproval.approval_data["approvalEmployeeId"] = req.body.resourceType || searchApproval.approval_data["approvalEmployeeId"];         //자재 등록 아이디
       searchApproval.markModified('approval_data');     //Schema가 mixed 타입일 경우 해당 함수 호출해야 mixed 타입 수정이 된다.
 
       searchApproval.reference_employee_id = req.body.referenceEmployeeId || searchApproval.reference_employee_id;   //참조자목록
