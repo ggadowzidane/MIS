@@ -108,7 +108,7 @@ router.post("/mis/1.0/resources/approvals",function(req,res,next){
           approvalResourceName:req.body.approvalResourceName,     // 자재명
           approvalResourceCount:req.body.approvalResourceCount,   // 자재 갯수
           approvalResourceType:req.body.approvalResourceType,     // 자재 타입
-          approvalEmployeeId:req.body.approvalEmployeeId,         // 자재 담당자 아이디
+          approvalManagerId:req.body.approvalManagerId,         // 자재 담당자 아이디
           approvalYn:'N',                                         // 결재 여부
           approvalInsertEmployeeId:req.body.approvalInsertEmployeeId, // 자재 등록 아이디
           iunsertDate:new Date()                                   // insert_date
@@ -188,14 +188,14 @@ router.put("/mis/1.0/resources/approvals/:approvalCode",function(req,res,next){
     code:req.params.approvalCode
   }).exec(function(error,searchApproval){
     if(searchApproval.state==1){  // 결재 상태가 기안인 경우 update 진행
-      searchApproval.approval_data["approvalResourceCount"] = req.body.resourceCount || searchApproval.approval_data["approvalResourceCount"];  //자재명
-      searchApproval.approval_data["approvalResourceName"] = req.body.resourceName || searchApproval.approval_data["approvalResourceName"];     //휴가 시작일자
-      searchApproval.approval_data["approvalResourceType"] = req.body.resourceType || searchApproval.approval_data["approvalResourceType"];     //자재 타입
-      searchApproval.approval_data["approvalEmployeeId"] = req.body.resourceType || searchApproval.approval_data["approvalEmployeeId"];         //자재 등록 아이디
+      searchApproval.approval_data["approvalResourceCount"] = req.body.approvalResourceCount || searchApproval.approval_data["approvalResourceCount"];  //자재명
+      searchApproval.approval_data["approvalResourceName"] = req.body.approvalResourceName || searchApproval.approval_data["approvalResourceName"];     //휴가 시작일자
+      searchApproval.approval_data["approvalResourceType"] = req.body.approvalResourceType || searchApproval.approval_data["approvalResourceType"];     //자재 타입
+      searchApproval.approval_data["approvalManagerId"] = req.body.approvalManagerId || searchApproval.approval_data["approvalManagerId"];         //자재 등록 아이디
       searchApproval.markModified('approval_data');     //Schema가 mixed 타입일 경우 해당 함수 호출해야 mixed 타입 수정이 된다.
 
-      searchApproval.reference_employee_id = req.body.referenceEmployeeId || searchApproval.reference_employee_id;   //참조자목록
-      searchApproval.request_description = req.body.requestDescription || searchApproval.request_description;   //요청 사유
+      searchApproval.reference_employee_id = req.body.approvalReferenceEmployeeId || searchApproval.reference_employee_id;   //참조자목록
+      searchApproval.request_description = req.body.approvalRequestDescription || searchApproval.request_description;   //요청 사유
       searchApproval.approval_employee_id = req.body.approvalEmployeeId || searchApproval.approval_employee_id;   //승인자목록
 
       searchApproval.save(function(error,approval){
